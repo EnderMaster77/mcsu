@@ -19,13 +19,8 @@ def main():
     else:
         print("Version Selected:", args.version)
     if args.servertype == "paper":
-        dl_link = get_latest_papermc_version(args.version, args.releasechannel)
-        if dl_link is not None:
-            print(f"downloading jar from: {dl_link}")
-            download_jar(dl_link)
-        else:
-            print(
-                "Download failed! You may have incorrectly typed the version or release channel.")
+        download_jar(get_latest_papermc_version(
+            args.version, args.releasechannel))
     elif args.servertype == "vanilla":
         print("vanilla")
     elif args.servertype == "fabric":
@@ -37,18 +32,26 @@ def main():
         return ()
 
 
+def get_latest_build_papermc(data={}, releasechannel="default"):
+    latest_build = None
+    for build in data['builds']:
+        if build['channel'] == releasechannel:
+            latest_build = build
+    if latest_build is None:
+        print(f"Build for release channel '{
+              releasechannel}' not found. Exiting.")
+        quit()
+    return latest_build
+
+
 def get_latest_papermc_version(version="1.19.2", releasechannel="default"):
     url = f"https://papermc.io/api/v2/projects/paper/versions/{version}/builds"
     response = requests.get(url)
     data = response.json()
-
     try:
-        latest_build = None
-        for build in data['builds']:
-            if build['channel'] == releasechannel:
-                latest_build = build
+        latest_build = get_latest_build_papermc(data, releasechannel)
         latest_build_num = latest_build['build']
-        print(latest_build['channel'])
+        print(f"Release Channel: {latest_build['channel']}")
         download_url = f"https://api.papermc.io/v2/projects/paper/versions/{
             version}/builds/{latest_build_num}/downloads/paper-{version}-{latest_build_num}.jar"
         return download_url
@@ -57,6 +60,11 @@ def get_latest_papermc_version(version="1.19.2", releasechannel="default"):
 
 
 def download_jar(url=""):
+    if url != "" and url is not None:
+        print(f"downloading jar from: {url}")
+    else:
+        print("Download URL not found! Try changing the minecraft version.")
+        return
     query_params = {"downloadformat": "jar"}
     response = requests.get(url, params=query_params)
     if response.status_code == 200:
