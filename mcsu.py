@@ -15,9 +15,30 @@ def main():
 
     if args.version is None:
         print("Please set a version!")
-        return
+        quit()
     else:
         print("Version Selected:", args.version)
+
+    jar_setup(args)  # Downloads the Jar file.
+    startup_setup()
+
+
+def startup_setup():
+    eularesponse = input("Agree to Eula? [y/n]")
+    while True:
+        if eularesponse.lower() == "n":
+            print("responded N")
+            break
+        elif eularesponse.lower() == "y":
+            print("Responded Y")
+            eula = open("eula.txt", "w")
+            eula.write("eula=true")
+            break
+        else:
+            eularesponse = input("Agree to Eula? [y/n]")
+
+
+def jar_setup(args):
     if args.servertype == "paper":
         download_jar(get_latest_papermc_version(
             args.version, args.releasechannel))
@@ -29,7 +50,7 @@ def main():
         print("forge")
     else:
         print("Server type not found!")
-        return ()
+        quit()
 
 
 def get_latest_build_papermc(data={}, releasechannel="default"):
