@@ -8,4 +8,5 @@ I plan to add some of these features. Some may be cut, but I will try to add as 
 - Whitelist sharing
 - Plugin/Mod manager for searching, downloading and adding plugins to a server. (I might make this a seperate tool)
 - Server Manager for managing and starting servers.
+- Documentation
 
