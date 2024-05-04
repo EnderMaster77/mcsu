@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import requests
-import json
+import platform
 
 
 def main():
@@ -20,17 +20,43 @@ def main():
         print("Version Selected:", args.version)
 
     jar_setup(args)  # Downloads the Jar file.
-    startup_setup()
+    startup_setup()  # Gives EULA prompt and creates run.sh.
 
 
 def startup_setup():
-    eularesponse = input("Agree to Eula? [y/n]")
+    eula_prompt()
+    create_run_script()
+
+
+def create_run_script():
+    print("Creating Script.")
+    if platform.platform().lower() == "windows":
+        print("Windows script creation not supported yet!")
+        return
+    while True:
+        ram = input("RAM (Gigabytes):")
+        try:
+            ram = int(ram)
+            break
+        except ValueError:
+            print("Please type a whole number.")
+    try:
+        startsh = open("start.sh", "w")
+        startsh.write(f"java -jar -Xmx{ram}G server.jar --nogui")
+    except IOError as e:
+        print(f"Run script creation failed, Couldn't write to file ({e})")
+        return ()
+    print("Run script created succesfully.")
+
+
+def eula_prompt():
+    eularesponse = input("Agree to Minecraft Eula? [y/n]")
     while True:
         if eularesponse.lower() == "n":
-            print("responded N")
+            print("Did not agree to EULA. Server will not start.")
             break
         elif eularesponse.lower() == "y":
-            print("Responded Y")
+            print("Agreeing to EULA")
             eula = open("eula.txt", "w")
             eula.write("eula=true")
             break
